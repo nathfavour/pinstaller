@@ -1,71 +1,49 @@
-# pinstaller README
+# PInstaller - Dependency Installer for VSCode
 
-This is the README for your extension "pinstaller". After writing up a brief description, we recommend including the following sections.
+PInstaller is a Visual Studio Code extension designed to streamline the process of installing dependencies directly from import statements. It simplifies your workflow by detecting uninstalled packages and providing a quick fix to install them using your preferred Node.js package manager.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- **Automatic Package Detection**: Detects uninstalled packages from import statements with red error underlines.
+- **Quick Fix Installation**: Provides a "Quick Fix" option to install the missing package when hovering over the error.
+- **Package Manager Support**: Supports popular Node.js package managers like `npm`, `yarn`, and `pnpm`.
+- **Intelligent Package Name Parsing**: Accurately identifies package names, even when submodules are included in the import path.
+- **Seamless Integration**: Automatically detects the package manager being used in your project.
 
-For example if there is an image subfolder under your extension project workspace:
+## How It Works
 
-\!\[feature X\]\(images/feature-x.png\)
+1. Write your import statement in your code.
+2. If the package is not installed, a red error underline will appear.
+3. Hover over the error and select the "Quick Fix" option.
+4. PInstaller will install the package using your default package manager.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## Installation
 
-## Requirements
+1. Open the Extensions view in VSCode (`Ctrl+Shift+X` or `Cmd+Shift+X` on macOS).
+2. Search for `PInstaller`.
+3. Click "Install" to add the extension to your editor.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## Usage
 
-## Extension Settings
+1. Ensure your project is using one of the supported package managers (`npm`, `yarn`, or `pnpm`).
+2. Write your import statements as usual.
+3. Hover over any uninstalled package import with a red underline.
+4. Select the "Quick Fix" option to install the package.
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+## Supported Package Managers
 
-For example:
+- npm
+- yarn
+- pnpm
 
-This extension contributes the following settings:
+## Contributing
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+Contributions are welcome! If you'd like to contribute, please fork the repository and submit a pull request. For major changes, please open an issue first to discuss what you would like to change.
 
-## Known Issues
+## License
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Happy coding with PInstaller! 🚀  
