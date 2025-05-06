@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import * as child_process from 'child_process';
+// Removed unused import of 'child_process'
 import * as path from 'path';
 
 // This method is called when your extension is activated
@@ -14,32 +14,28 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.languages.registerCodeActionsProvider(
 			{ scheme: 'file', language: 'typescript' },
 			new InstallDependencyProvider(),
-			{ providedCodeActionKinds: [vscode.CodeActionKind.QuickFix]}
-
+			{ providedCodeActionKinds: [vscode.CodeActionKind.QuickFix] }
 		)
 	);
 
 }
 
 
-class InstallDependencyProvider implements vscode.CodeActionKind {
-		provideCodeActions(
+class InstallDependencyProvider implements vscode.CodeActionProvider {
 			document: vscode.TextDocument,
-			range: vscode.Range, 
-			context: vscode.CodeActionContext
+			// Removed unused parameters 'document' and 'range'
 		): vscode.CodeAction[] | undefined {
 			const diagnostics = context.diagnostics.filter(diagnostic =>
 				diagnostic.message.include('Cannot find module') ||
 			);
+				diagnostic.message.includes('Cannot find module')
 			if (diagnostics.length === 0) {
 				return;
 			}
-		}
-		);
 
 		const actions: vscode.CodeAction[] = [];
 		diagnostics.forEach(diagnostic => {
-			const match = diagnostic.message.match(/Cannot find module '(.*)'/)''
+			const match = diagnostic.message.match(/Cannot find module '(.*)'/);
 			if (match) {
 				const packageName = this.extractPackageName(match[1]);
 				const action = new vscode.CodeAction(
@@ -55,22 +51,20 @@ class InstallDependencyProvider implements vscode.CodeActionKind {
 				}
 			});
 			return actions;
-		})
+		}
+	
+	
 
 		private extractPackageName(importPath: string): string {
 
 			const parts = importPath.split('/');
 			return importPath.startsWith('@') ? `${parts[0]}/${parts[1]}` : parts[0];
 		}
-		}
+	}
 
 
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-
-}
-
-}
+	// Use the console to output diagnostic information (console.log) and errors (console.error
 
 
 vscode.commands.registerCommand('pinstaller.installDependency', async (packageName: string) => {
@@ -108,7 +102,7 @@ function fileExists(filePath: string): Promise<boolean> {
 	return new Promise(resolve => {
 		require('fs').access(filePath, require('fs').constants.F_OK, err => {
 			resolve(!err);
-		});
+		require('fs').access(filePath, require('fs').constants.F_OK, (err: any) => {
 	});
 }
 
