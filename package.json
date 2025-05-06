@@ -16,6 +16,10 @@
       {
         "command": "pinstaller.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "pinstaller.installDependency",
+        "title": "Install Dependency"
       }
     ]
   },
