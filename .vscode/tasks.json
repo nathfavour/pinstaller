@@ -52,6 +52,20 @@
 			},
 			"group": "build"
 		},
+
+
+            {
+      "label": "build",
+      "type": "typescript",
+      "tsconfig": "tsconfig.json",
+      "problemMatcher": ["$tsc"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+
+
 		{
 			"label": "tasks: watch-tests",
 			"dependsOn": [
