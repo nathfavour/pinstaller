@@ -4,6 +4,7 @@ PInstaller is a Visual Studio Code extension designed to streamline the process 
 
 ## Features
 
+
 - **Automatic Package Detection**: Detects uninstalled packages from import statements with red error underlines.
 - **Quick Fix Installation**: Provides a "Quick Fix" option to install the missing package when hovering over the error.
 - **Package Manager Support**: Supports popular Node.js package managers like `npm`, `yarn`, and `pnpm`.
