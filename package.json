@@ -4,6 +4,7 @@
   "description": "install dependencies directly from vscode",
   "version": "0.0.1",
   "publisher": "nathfavour",
+  "icon": "public/logo.jpg",
   "license": "MIT",
   "repository": {
     "type": "git",
