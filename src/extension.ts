@@ -1,17 +1,25 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
+const supportedLanguages = ['typescript', 'javascript']; // Add more languages as needed
+
 export function activate(context: vscode.ExtensionContext) {
   console.log('pinstaller is now active!');
 
   // Register Code Action Provider
+  supportedLanguages.forEach(language => {
   context.subscriptions.push(
     vscode.languages.registerCodeActionsProvider(
-      { scheme: 'file', language: 'javascript' }, // Adjust for other languages if needed
+      { scheme: 'file', language }, // Adjust for other languages if needed
       new InstallDependencyProvider(),
       { providedCodeActionKinds: [vscode.CodeActionKind.QuickFix] }
     )
   );
+
+  })
+
+
+
 }
 
 class InstallDependencyProvider implements vscode.CodeActionProvider {

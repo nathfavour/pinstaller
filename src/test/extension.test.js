@@ -38,6 +38,7 @@ const path = __importStar(require("path"));
 const test_electron_1 = require("@vscode/test-electron");
 const assert = __importStar(require("assert"));
 const vscode = __importStar(require("vscode"));
+const extension_1 = require("../extension");
 async function run() {
     try {
         await (0, test_electron_1.runTests)({
@@ -60,15 +61,57 @@ suite('Extension Test Suite', () => {
         assert.strictEqual(extension?.isActive, true, 'Extension is not active');
     });
     test('InstallDependencyProvider should be registered', async () => {
-        const languages = vscode.languages;
-        const providers = languages.getLanguages().map(language => {
-            return languages.registerCodeActionsProvider({ scheme: 'file', language }, new class {
+        const languages = await vscode.languages.getLanguages();
+        const providers = languages.map(language => {
+            return vscode.languages.registerCodeActionsProvider({ scheme: 'file', language }, new class {
                 provideCodeActions() {
                     return [];
                 }
             });
         });
         assert.ok(providers.length > 0, 'No Code Action Providers registered');
+    });
+    test('detectPackageManager should detect the correct package manager', async () => {
+        const mockFileExists = (filePath) => {
+            if (filePath.endsWith('pnpm-lock.yaml')) {
+                return Promise.resolve(true);
+            }
+            if (filePath.endsWith('yarn.lock')) {
+                return Promise.resolve(false);
+            }
+            if (filePath.endsWith('package-lock.json')) {
+                return Promise.resolve(false);
+            }
+            return Promise.resolve(false);
+        };
+        const originalFileExists = require('fs').access;
+        require('fs').access = (filePath, mode, callback) => {
+            mockFileExists(filePath).then(exists => {
+                callback(exists ? null : new Error('File not found'));
+            });
+        };
+        const packageManager = await (0, extension_1.detectPackageManager)();
+        assert.strictEqual(packageManager, 'pnpm', 'Failed to detect pnpm as the package manager');
+        // Restore original function
+        require('fs').access = originalFileExists;
+    });
+    test('InstallDependencyProvider should provide quick fix for missing module', async () => {
+        const diagnostic = {
+            message: "Cannot find module 'lodash'",
+            range: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 10)),
+        };
+        const context = { diagnostics: [diagnostic], triggerKind: vscode.CodeActionTriggerKind.Invoke, only: undefined };
+        const provider = new (class {
+            provideCodeActions(document, range, context) {
+                return [
+                    new vscode.CodeAction('Install lodash', vscode.CodeActionKind.QuickFix)
+                ];
+            }
+        })();
+        const actions = provider.provideCodeActions({}, new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 10)), context);
+        assert.ok(actions, 'No actions provided');
+        assert.strictEqual(actions?.length, 1, 'Incorrect number of actions provided');
+        assert.strictEqual(actions[0].title, 'Install lodash', 'Quick fix title is incorrect');
     });
 });
 //# sourceMappingURL=extension.test.js.map

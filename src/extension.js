@@ -34,14 +34,18 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
+exports.detectPackageManager = detectPackageManager;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
 const path = __importStar(require("path"));
+const supportedLanguages = ['typescript', 'javascript']; // Add more languages as needed
 function activate(context) {
     console.log('pinstaller is now active!');
     // Register Code Action Provider
-    context.subscriptions.push(vscode.languages.registerCodeActionsProvider({ scheme: 'file', language: 'javascript' }, // Adjust for other languages if needed
-    new InstallDependencyProvider(), { providedCodeActionKinds: [vscode.CodeActionKind.QuickFix] }));
+    supportedLanguages.forEach(language => {
+        context.subscriptions.push(vscode.languages.registerCodeActionsProvider({ scheme: 'file', language }, // Adjust for other languages if needed
+        new InstallDependencyProvider(), { providedCodeActionKinds: [vscode.CodeActionKind.QuickFix] }));
+    });
 }
 class InstallDependencyProvider {
     provideCodeActions(document, range, context) {
@@ -83,18 +87,20 @@ vscode.commands.registerCommand('pinstaller.installDependency', async (packageNa
 });
 async function detectPackageManager() {
     const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (!workspaceFolders) {
+    if (!workspaceFolders || workspaceFolders.length === 0) {
         return null;
     }
     const workspacePath = workspaceFolders[0].uri.fsPath;
-    if (await fileExists(path.join(workspacePath, 'pnpm-lock.yaml'))) {
-        return 'pnpm';
-    }
-    if (await fileExists(path.join(workspacePath, 'yarn.lock'))) {
-        return 'yarn';
-    }
-    if (await fileExists(path.join(workspacePath, 'package-lock.json'))) {
-        return 'npm';
+    // Check for pnpm, yarn, and npm lock files in order of priority
+    const lockFiles = [
+        { file: 'pnpm-lock.yaml', manager: 'pnpm' },
+        { file: 'yarn.lock', manager: 'yarn' },
+        { file: 'package-lock.json', manager: 'npm' },
+    ];
+    for (const { file, manager } of lockFiles) {
+        if (await fileExists(path.join(workspacePath, file))) {
+            return manager;
+        }
     }
     return null;
 }
