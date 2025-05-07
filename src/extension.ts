@@ -46,7 +46,7 @@ class InstallDependencyProvider implements vscode.CodeActionProvider {
         action.command = {
           command: 'pinstaller.installDependency',
           title: `Install ${packageName}`,
-          arguments: [packageName]
+          arguments: [packageName, document.uri]
         };
         actions.push(action);
       }
@@ -62,8 +62,15 @@ class InstallDependencyProvider implements vscode.CodeActionProvider {
   }
 }
 
-vscode.commands.registerCommand('pinstaller.installDependency', async (packageName: string) => {
-  const packageManager = await detectPackageManager();
+vscode.commands.registerCommand('pinstaller.installDependency', async (packageName: string, fileUri?: vscode.Uri) => {
+  let workspaceFolder: vscode.WorkspaceFolder | undefined;
+  if (fileUri) {
+    workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
+  }
+  if (!workspaceFolder && vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+    workspaceFolder = vscode.workspace.workspaceFolders[0];
+  }
+  const packageManager = await detectPackageManager(workspaceFolder);
   if (!packageManager) {
     vscode.window.showErrorMessage('No package manager detected in the workspace.');
     return;
@@ -74,13 +81,15 @@ vscode.commands.registerCommand('pinstaller.installDependency', async (packageNa
   terminal.sendText(`${packageManager} add ${packageName}`);
 });
 
-export async function detectPackageManager(): Promise<string | null> {
-  const workspaceFolders = vscode.workspace.workspaceFolders;
-  if (!workspaceFolders || workspaceFolders.length === 0) {
+export async function detectPackageManager(workspaceFolder?: vscode.WorkspaceFolder): Promise<string | null> {
+  let workspacePath: string | undefined;
+  if (workspaceFolder) {
+    workspacePath = workspaceFolder.uri.fsPath;
+  } else if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+    workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+  } else {
     return null;
   }
-
-  const workspacePath = workspaceFolders[0].uri.fsPath;
 
   // Check for pnpm, yarn, and npm lock files in order of priority
   const lockFiles = [

@@ -64,6 +64,35 @@ suite('Extension Test Suite', () => {
     require('fs').access = originalFileExists;
   });
 
+  test('detectPackageManager uses correct workspace folder for file', async () => {
+    // Mock two workspace folders
+    const folder1 = { uri: { fsPath: '/workspace/folder1' } } as vscode.WorkspaceFolder;
+    const folder2 = { uri: { fsPath: '/workspace/folder2' } } as vscode.WorkspaceFolder;
+    (vscode.workspace as any).workspaceFolders = [folder1, folder2];
+
+    // Mock fileExists to simulate lock files in each folder
+    const mockFileExists = (filePath: string) => {
+      if (filePath === '/workspace/folder1/pnpm-lock.yaml') { return Promise.resolve(true); }
+      if (filePath === '/workspace/folder2/yarn.lock') { return Promise.resolve(true); }
+      return Promise.resolve(false);
+    };
+    const originalFileExists = require('fs').access;
+    require('fs').access = (filePath: string, mode: any, callback: any) => {
+      mockFileExists(filePath).then(exists => {
+        callback(exists ? null : new Error('File not found'));
+      });
+    };
+
+    // Should detect pnpm for folder1
+    let pm = await detectPackageManager(folder1);
+    assert.strictEqual(pm, 'pnpm', 'Should detect pnpm for folder1');
+    // Should detect yarn for folder2
+    pm = await detectPackageManager(folder2);
+    assert.strictEqual(pm, 'yarn', 'Should detect yarn for folder2');
+
+    require('fs').access = originalFileExists;
+  });
+
   test('InstallDependencyProvider should provide quick fix for missing module', async () => {
     const diagnostic = {
       message: "Cannot find module 'lodash'",
