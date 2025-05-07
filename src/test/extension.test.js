@@ -33,16 +33,42 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+const path = __importStar(require("path"));
+// import { runTests } from 'vscode-test';
+const test_electron_1 = require("@vscode/test-electron");
 const assert = __importStar(require("assert"));
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
 const vscode = __importStar(require("vscode"));
-// import * as myExtension from '../../extension';
+async function run() {
+    try {
+        await (0, test_electron_1.runTests)({
+            version: 'stable',
+            extensionDevelopmentPath: path.resolve(__dirname, '../..'),
+            extensionTestsPath: path.resolve(__dirname, './suite/index'),
+        });
+    }
+    catch (err) {
+        console.error('Failed to run tests');
+        process.exit(1);
+    }
+}
+run();
 suite('Extension Test Suite', () => {
     vscode.window.showInformationMessage('Start all tests.');
-    test('Sample test', () => {
-        assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-        assert.strictEqual(-1, [1, 2, 3].indexOf(0));
+    test('Extension should be active', async () => {
+        const extension = vscode.extensions.getExtension('your-publisher-name.pinstaller');
+        assert.ok(extension, 'Extension is not found');
+        assert.strictEqual(extension?.isActive, true, 'Extension is not active');
+    });
+    test('InstallDependencyProvider should be registered', async () => {
+        const languages = vscode.languages;
+        const providers = languages.getLanguages().map(language => {
+            return languages.registerCodeActionsProvider({ scheme: 'file', language }, new class {
+                provideCodeActions() {
+                    return [];
+                }
+            });
+        });
+        assert.ok(providers.length > 0, 'No Code Action Providers registered');
     });
 });
 //# sourceMappingURL=extension.test.js.map

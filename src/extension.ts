@@ -70,25 +70,25 @@ vscode.commands.registerCommand('pinstaller.installDependency', async (packageNa
 
 async function detectPackageManager(): Promise<string | null> {
   const workspaceFolders = vscode.workspace.workspaceFolders;
-  if (!workspaceFolders) {
+  if (!workspaceFolders || workspaceFolders.length === 0) {
     return null;
   }
 
   const workspacePath = workspaceFolders[0].uri.fsPath;
-  if (await fileExists(path.join(workspacePath, 'pnpm-lock.yaml'))) {
-    return 'pnpm';
-  }
-  if (await fileExists(path.join(workspacePath, 'yarn.lock'))) {
-    return 'yarn';
-  }
-  if (await fileExists(path.join(workspacePath, 'package-lock.json'))) {
-    return 'npm';
-  }
-  return null;
-}
 
-function fileExists(filePath: string): Promise<boolean> {
-  return new Promise(resolve => {
+  // Check for pnpm, yarn, and npm lock files in order of priority
+  const lockFiles = [
+    { file: 'pnpm-lock.yaml', manager: 'pnpm' },
+    { file: 'yarn.lock', manager: 'yarn' },
+    { file: 'package-lock.json', manager: 'npm' },
+  ];
+
+  for (const { file, manager } of lockFiles) {
+    if (await fileExists(path.join(workspacePath, file))) {
+      return manager;
+    }
+  }
+
     require('fs').access(filePath, require('fs').constants.F_OK, (err: any) => {
       resolve(!err);
     });
