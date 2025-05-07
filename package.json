@@ -2,7 +2,7 @@
   "name": "pinstaller",
   "displayName": "pinstaller",
   "description": "install dependencies directly from vscode",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "nathfavour",
   "icon": "public/logo.jpg",
   "license": "MIT",
