@@ -68,7 +68,7 @@ vscode.commands.registerCommand('pinstaller.installDependency', async (packageNa
   terminal.sendText(`${packageManager} add ${packageName}`);
 });
 
-async function detectPackageManager(): Promise<string | null> {
+export async function detectPackageManager(): Promise<string | null> {
   const workspaceFolders = vscode.workspace.workspaceFolders;
   if (!workspaceFolders || workspaceFolders.length === 0) {
     return null;
@@ -89,6 +89,11 @@ async function detectPackageManager(): Promise<string | null> {
     }
   }
 
+  return null;
+}
+
+function fileExists(filePath: string): Promise<boolean> {
+  return new Promise(resolve => {
     require('fs').access(filePath, require('fs').constants.F_OK, (err: any) => {
       resolve(!err);
     });
